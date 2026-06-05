@@ -1,0 +1,45 @@
+cmake_minimum_required(VERSION 3.11)
+project(CVE-2026-40369 LANGUAGES CXX)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(PROJECT_INCLUDE
+
+    include/core/def.hpp
+    include/core/poc.hpp
+    include/core/exp.hpp
+
+    include/utils/environment.hpp
+    include/utils/gadget.hpp
+
+    include/common/shellcode.hpp
+    include/common/memtools.hpp
+    include/common/gadget.hpp
+
+    include/describe/vuln_description.hpp
+)
+
+set(PROJECT_SOURCE
+    src/main.cpp
+    src/core/poc.cpp
+    src/core/exp.cpp
+
+    src/utils/environment.cpp
+    src/utils/gadget.cpp
+
+    src/common/shellcode.cpp
+    src/common/memtools.cpp
+    src/common/gadget.cpp
+
+    src/describe/vuln_description.cpp
+)
+
+# Specify MSVC UTF-8 encoding
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+link_libraries("Ws2_32.lib")
+link_libraries("ntdll.lib")
+
+add_executable(${PROJECT_NAME} ${PROJECT_INCLUDE} ${PROJECT_SOURCE})
+target_compile_definitions(${PROJECT_NAME} PRIVATE UNICODE _UNICODE)
