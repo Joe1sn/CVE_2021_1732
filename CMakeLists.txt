@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11)
-project(CVE-2026-40369 LANGUAGES CXX)
+project(CVE_2021_1732 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,6 +24,7 @@ set(PROJECT_SOURCE
     src/main.cpp
     src/core/poc.cpp
     src/core/exp.cpp
+    src/core/def.cpp
 
     src/utils/environment.cpp
     src/utils/gadget.cpp

