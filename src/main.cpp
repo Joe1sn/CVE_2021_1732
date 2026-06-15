@@ -8,7 +8,5 @@ int main()
 {
     CVE_2021_1732::PoC();
     // CVE_2021_1732::Exp();
-    // std::cout << CVE_2021_1732::CheckSeDebugPrivilege() << std::endl;
-
     return 0;
 }

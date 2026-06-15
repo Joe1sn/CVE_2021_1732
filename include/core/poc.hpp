@@ -8,7 +8,5 @@
 
 namespace CVE_2021_1732
 {
-    LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     bool PoC();
-    NTSTATUS MyxxxClientAllocWindowClassExtraBytes(unsigned int* pSize);
 } // namespace CVE_2021_1732
