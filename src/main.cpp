@@ -6,7 +6,7 @@
 using namespace CVE_2021_1732;
 int main()
 {
-    CVE_2021_1732::PoC();
-    // CVE_2021_1732::Exp();
+    // CVE_2021_1732::PoC();
+    CVE_2021_1732::Exp();
     return 0;
 }

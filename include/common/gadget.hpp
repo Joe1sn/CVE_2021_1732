@@ -11,23 +11,40 @@ namespace exploit
                 namespace tagWNDK
                 {
                     constexpr size_t tagWNDK = 0x28;
+
                     constexpr size_t HWND = 0x00;
-                    constexpr size_t KernelDesktopHeapBase = 0x08;
+                    constexpr size_t KernelDesktopHeapBaseOffset = 0x08;
+                    constexpr size_t dwStyle = 0x18;
+                    constexpr size_t WndRectLeft = 0x58;
+                    constexpr size_t WndRectRight = 0x5C;
+                    constexpr size_t spMenu = 0x98;
                     constexpr size_t cbWndExtra = 0xC8;
                     constexpr size_t dwExtraFlag = 0xE8;
                     constexpr size_t pExtraByte = 0x128;
+
                 } // namespace tagWNDK
+                namespace spMenu {
+                    constexpr size_t tagWNDK = 0x90;
+                    constexpr size_t hMenu = 0x00;
+                    constexpr size_t unknown0 = 0x18;
+                    namespace Unknown0 {
+                        constexpr size_t unknown00 = 0x100;
+                        namespace Unknown00 {
+                            constexpr size_t eprocess = 0x00;
+
+                        }//unknown00
+
+                    }//unknown0
+                }// namespace spMenu
             } // namespace tagWND
 
             namespace EPROCESS
             {
-
-                constexpr size_t UniqueProcessId = 0x1D0;
-                constexpr size_t ActiveProcessLinks = 0x1D8;
-                constexpr size_t ImageFileName = 0x338;
-                constexpr size_t Token = 0x248;
+                constexpr size_t UniqueProcessId = 0x2E0;
+                constexpr size_t ActiveProcessLinks = 0x2E8;
+                constexpr size_t ImageFileName = 0x450;
+                constexpr size_t Token = 0x358;
             } // namespace EPROCESS
-            constexpr size_t _SEP_TOKEN_PRIVILEGES = 0x40;
         }
 
         namespace X_19045_2006
